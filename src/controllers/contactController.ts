@@ -25,7 +25,7 @@ export class ContactController {
       const { email, phoneNumber } = validationResult.data;
 
       // Process the identification request
-      const result = await this.contactService.identifyContact(email, phoneNumber);
+      const result = await this.contactService.identifyContact(email, phoneNumber?.toString());
 
       res.status(200).json(result);
     } catch (error) {
