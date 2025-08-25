@@ -268,8 +268,11 @@ export class ContactService {
       }
     }
 
-    // Check if we need to create a new secondary contact
-    const shouldCreateSecondary = this.shouldCreateSecondaryContact(oldestGroup, email, phoneNumber);
+    // Fetch updated data first
+    const updatedGroup = await this.getContactGroup(oldestGroup.primaryContact.id);
+    
+    // Check if we need to create a new secondary contact using the updated group
+    const shouldCreateSecondary = this.shouldCreateSecondaryContact(updatedGroup, email, phoneNumber);
 
     if (shouldCreateSecondary) {
       await this.createSecondaryContact(
@@ -277,10 +280,14 @@ export class ContactService {
         email,
         phoneNumber
       );
+      
+      // Fetch the final updated data after creating secondary contact
+      const finalGroup = await this.getContactGroup(oldestGroup.primaryContact.id);
+      return this.buildResponse(
+        finalGroup.primaryContact,
+        finalGroup.secondaryContacts
+      );
     }
-
-    // Fetch updated data
-    const updatedGroup = await this.getContactGroup(oldestGroup.primaryContact.id);
     
     return this.buildResponse(
       updatedGroup.primaryContact,
